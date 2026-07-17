@@ -1,9 +1,13 @@
 # API Keys
 .env
 
-# Data
-data/
-*.csv
+# Data (except UI and test files)
+data/*.csv
+data/dashboard_*.html
+!data/dashboard_v3_ui.html
+data/daily_report_*.csv
+data/portfolio_*.csv
+!data/stock_data_NVDA.json
 
 # Python
 __pycache__/
