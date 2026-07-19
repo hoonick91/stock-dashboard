@@ -578,34 +578,38 @@ def _get_city(ip):
 
 
 def _send_discord(msg):
+    import requests as _req
     webhook = os.getenv('DISCORD_WEBHOOK')
     if not webhook:
+        print('[Discord] 웹훅 URL 없음')
         return
     try:
-        requests.post(webhook, json={'content': msg}, timeout=5)
-    except Exception:
-        pass
+        r = _req.post(webhook, json={'content': msg}, timeout=5)
+        print(f'[Discord] 전송 완료: {r.status_code}')
+    except Exception as e:
+        print(f'[Discord] 전송 실패: {e}')
 
 
 @app.route('/api/log', methods=['POST'])
 def log_event():
+    import threading
     data = request.get_json() or {}
     symbol = data.get('symbol', '?').upper()
     ua = data.get('userAgent', '')
-
     ip = request.headers.get('X-Forwarded-For', request.remote_addr or '')
     ip = ip.split(',')[0].strip()
 
-    device, os_name, browser = _parse_ua(ua)
-    city = _get_city(ip)
+    def _notify():
+        device, os_name, browser = _parse_ua(ua)
+        city = _get_city(ip)
+        now = datetime.now().strftime('%Y-%m-%d %H:%M')
+        parts = [f'**{symbol}**', f'{device} · {os_name} · {browser}']
+        if city:
+            parts.append(city)
+        parts.append(now)
+        _send_discord(' | '.join(parts))
 
-    now = datetime.now().strftime('%Y-%m-%d %H:%M')
-    parts = [f'**{symbol}**', f'{device} · {os_name} · {browser}']
-    if city:
-        parts.append(city)
-    parts.append(now)
-
-    _send_discord(' | '.join(parts))
+    threading.Thread(target=_notify, daemon=True).start()
     return jsonify({'ok': True})
 
 
