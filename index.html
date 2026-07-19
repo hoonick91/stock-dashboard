@@ -910,7 +910,7 @@
         // ── API 호출 ──────────────────────────────────────────────────────────
         async function loadMacro() {
             try {
-                const r = await fetch(API_BASE + '/api/macro');
+                const r = await fetch(API_BASE + '/api/macro', { headers: { 'ngrok-skip-browser-warning': '1' } });
                 if (!r.ok) return;
                 macroData = await r.json();
                 updateMacroBanner(macroData);
@@ -924,7 +924,7 @@
             const btn = document.querySelector('.search-btn');
             btn.textContent = '...'; btn.disabled = true;
             try {
-                const r = await fetch(API_BASE + '/api/stock/' + encodeURIComponent(symbol));
+                const r = await fetch(API_BASE + '/api/stock/' + encodeURIComponent(symbol), { headers: { 'ngrok-skip-browser-warning': '1' } });
                 if (!r.ok) {
                     const err = await r.json().catch(() => ({}));
                     alert(err.error || `${symbol} 데이터를 불러올 수 없습니다.`);
@@ -1313,7 +1313,7 @@
                 const sym = currentData.symbol;
                 const key = `technicals:${sym}:${chartTimeframe}`;
                 try {
-                    const r = await fetch(API_BASE + `/api/stock/${encodeURIComponent(sym)}/technicals?timeframe=${chartTimeframe}`);
+                    const r = await fetch(API_BASE + `/api/stock/${encodeURIComponent(sym)}/technicals?timeframe=${chartTimeframe}`, { headers: { 'ngrok-skip-browser-warning': '1' } });
                     if (!r.ok) return;
                     const tech = await r.json();
                     currentData = {
