@@ -535,51 +535,61 @@
 
         /* RSI Gauge */
         .gauge-container {
+            margin: 16px 0;
+        }
+
+        .gauge-value-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .gauge-value {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1;
+        }
+
+        .gauge-bar-wrap {
             position: relative;
-            height: 120px;
-            margin: 20px 0;
+            padding-top: 16px;
+        }
+
+        .gauge-marker {
+            position: absolute;
+            top: 0;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .gauge-arrow {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 10px solid #2d3748;
+            margin: 0 auto;
         }
 
         .gauge-bg {
             width: 100%;
-            height: 24px;
+            height: 20px;
             background: linear-gradient(90deg,
                 #48bb78 0%,
                 #ecc94b 30%,
                 #a0aec0 50%,
                 #ecc94b 70%,
                 #f56565 100%);
-            border-radius: 12px;
-            position: relative;
-        }
-
-        .gauge-marker {
-            position: absolute;
-            top: -50px;
-            transform: translateX(-50%);
-            text-align: center;
-        }
-
-        .gauge-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: #2d3748;
-        }
-
-        .gauge-arrow {
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 12px solid #2d3748;
-            margin: 4px auto;
+            border-radius: 10px;
         }
 
         .gauge-labels {
             display: flex;
             justify-content: space-between;
             margin-top: 8px;
-            font-size: 0.85em;
+            font-size: 0.82em;
             color: #718096;
         }
 
@@ -659,7 +669,7 @@
             td { padding: 10px; font-size: 0.85em; }
 
             /* RSI Gauge */
-            .gauge-value { font-size: 1.5em; }
+            .gauge-value { font-size: 1.8em; }
         }
 
         @media (max-width: 420px) {
@@ -781,11 +791,15 @@
                 <div class="chart-section">
                     <div class="chart-title">RSI (Relative Strength Index)</div>
                     <div class="gauge-container">
-                        <div class="gauge-marker" id="rsi-gauge-marker" style="left: 50%;">
+                        <div class="gauge-value-row">
                             <div class="gauge-value" id="rsi-gauge-value">--</div>
-                            <div class="gauge-arrow"></div>
                         </div>
-                        <div class="gauge-bg"></div>
+                        <div class="gauge-bar-wrap">
+                            <div class="gauge-marker" id="rsi-gauge-marker" style="left: 50%;">
+                                <div class="gauge-arrow"></div>
+                            </div>
+                            <div class="gauge-bg"></div>
+                        </div>
                         <div class="gauge-labels">
                             <span>0 (과매도)</span>
                             <span>30</span>
