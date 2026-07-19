@@ -585,41 +585,89 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+
+            /* Header */
             .header {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 16px;
+                gap: 12px;
             }
+            .logo { font-size: 1.1em; }
+            .timestamp { display: none; }
+            .search-container { max-width: 100%; }
+            .search-input { padding: 12px 52px 12px 14px; font-size: 16px; }
 
-            .search-container {
-                max-width: 100%;
-            }
+            /* Market Overview */
+            .macro-banner { padding: 16px; }
+            .macro-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .macro-card { padding: 10px 12px; }
+            .macro-card-value { font-size: 1.3em; }
+            .macro-card-desc { display: none; }
 
+            /* Stock Header */
+            .stock-main { padding: 16px; }
             .stock-header {
-                flex-direction: column;
-                gap: 24px;
+                flex-direction: row;
+                align-items: center;
+                gap: 0;
+                padding-bottom: 16px;
+                margin-bottom: 16px;
+            }
+            .stock-info h1 { font-size: 1.6em; }
+            .stock-info .company-name { font-size: 0.85em; }
+            .stock-price { text-align: right; }
+            .price-current { font-size: 2em; }
+            .price-change { font-size: 1em; margin-top: 4px; }
+            .market-cap { font-size: 0.82em; margin-top: 4px; }
+
+            /* Tabs */
+            .tab-nav { gap: 0; }
+            .tab-btn {
+                flex: 1;
+                text-align: center;
+                padding: 10px 8px;
+                font-size: 0.9em;
             }
 
-            .stock-price {
-                text-align: left;
-            }
-
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tab-nav {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
+            /* Period Selector */
             .period-selector {
-                flex-direction: column;
-                align-items: stretch;
+                flex-direction: row;
+                align-items: center;
+                padding: 10px 12px;
+                gap: 8px;
             }
+            .period-label { font-size: 0.85em; white-space: nowrap; }
+            .period-btn { padding: 6px 10px; font-size: 0.85em; }
 
-            .period-btn-group {
-                justify-content: stretch;
-            }
+            /* Metrics */
+            .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .metric-card { padding: 16px; }
+            .metric-value { font-size: 1.6em; }
+
+            /* Chart */
+            .chart-section { padding: 16px; }
+            .chart-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .sma-chart-container { height: 220px !important; }
+
+            /* Tables */
+            .table-section { padding: 14px; }
+            th { padding: 8px 10px; font-size: 0.78em; }
+            td { padding: 10px; font-size: 0.85em; }
+
+            /* RSI Gauge */
+            .gauge-value { font-size: 1.5em; }
+        }
+
+        @media (max-width: 420px) {
+            .macro-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .metrics-grid { grid-template-columns: 1fr; }
+            .stock-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .stock-price { text-align: left; }
+            .price-current { font-size: 1.8em; }
         }
 
         /* Loading State */
