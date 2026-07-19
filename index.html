@@ -932,6 +932,11 @@
                 }
                 currentData = await r.json();
                 renderAll(currentData);
+                fetch(API_BASE + '/api/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '1' },
+                    body: JSON.stringify({ symbol, userAgent: navigator.userAgent })
+                }).catch(() => {});
             } catch (e) {
                 alert('서버 연결 실패: ' + e.message + '\n\nscripts/ 에서 python3 flask_server.py 를 실행해 주세요.');
             } finally {
