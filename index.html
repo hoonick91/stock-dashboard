@@ -84,6 +84,35 @@
             background: #5568d3;
         }
 
+        .autocomplete-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 200;
+            overflow: hidden;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #2d3748;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.active {
+            background: #f0f4ff;
+            color: #667eea;
+        }
+
         .timestamp {
             color: #718096;
             font-size: 0.9em;
@@ -702,8 +731,9 @@
         <div class="header">
             <div class="logo">📊 Stock Dashboard</div>
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="종목 티커 입력 (예: NVDA, AAPL, MSFT...)" value="NVDA">
+                <input type="text" class="search-input" id="search-input" placeholder="종목 티커 입력 (예: NVDA, AAPL, MSFT...)" value="NVDA" autocomplete="off">
                 <button class="search-btn">분석</button>
+                <div class="autocomplete-list" id="autocomplete-list"></div>
             </div>
             <div class="timestamp" id="timestamp">로딩 중...</div>
         </div>
@@ -1407,6 +1437,59 @@
         document.querySelector('.search-btn').addEventListener('click', doSearch);
         document.querySelector('.search-input').addEventListener('keypress', e => {
             if (e.key === 'Enter') doSearch();
+        });
+
+        // ── 자동완성 ─────────────────────────────────────────────────────────
+        let allSymbols = [];
+        let acIndex = -1;
+
+        fetch(API_BASE + '/api/symbols', { headers: { 'ngrok-skip-browser-warning': '1' } })
+            .then(r => r.json()).then(d => { allSymbols = d; }).catch(() => {});
+
+        const acInput = document.getElementById('search-input');
+        const acList  = document.getElementById('autocomplete-list');
+
+        function showAc(items) {
+            acIndex = -1;
+            if (!items.length) { acList.style.display = 'none'; return; }
+            acList.innerHTML = items.slice(0, 8).map((s, i) =>
+                `<div class="autocomplete-item" data-val="${s}">${s}</div>`
+            ).join('');
+            acList.style.display = 'block';
+            acList.querySelectorAll('.autocomplete-item').forEach(el => {
+                el.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    acInput.value = el.dataset.val;
+                    acList.style.display = 'none';
+                    doSearch();
+                });
+            });
+        }
+
+        acInput.addEventListener('input', () => {
+            const q = acInput.value.trim().toUpperCase();
+            if (!q) { acList.style.display = 'none'; return; }
+            showAc(allSymbols.filter(s => s.startsWith(q)));
+        });
+
+        acInput.addEventListener('keydown', e => {
+            const items = acList.querySelectorAll('.autocomplete-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                acIndex = Math.min(acIndex + 1, items.length - 1);
+                items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                acIndex = Math.max(acIndex - 1, 0);
+                items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+            } else if (e.key === 'Escape') {
+                acList.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.search-container')) acList.style.display = 'none';
         });
 
         // ── 초기 로드 ────────────────────────────────────────────────────────

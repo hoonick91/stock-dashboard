@@ -395,6 +395,25 @@ def index():
     return '<h1>Stock Dashboard</h1><p>dashboard_v3_ui.html not found</p>'
 
 
+_POPULAR = [
+    'AAPL','MSFT','NVDA','AMZN','GOOGL','META','TSLA','BRK.B','UNH','XOM',
+    'JPM','JNJ','V','PG','MA','HD','CVX','MRK','ABBV','LLY','AVGO','PEP',
+    'KO','COST','TMO','MCD','WMT','BAC','CSCO','ACN','ABT','NEE','TXN','PM',
+    'HON','QCOM','IBM','AMD','INTU','CAT','GS','BA','MS','GE','ORCL','CRM',
+    'NFLX','INTC','ADBE','NOW','UBER','PLTR','SNOW','ARM','TSM','BABA','NKE',
+    'DIS','PYPL','SHOP','SQ','COIN','MSTR','SPY','QQQ','SOFI','CRCL',
+]
+
+@app.route('/api/symbols')
+def get_symbols():
+    stocks_dir = os.path.join(os.path.dirname(__file__), '..', 'cache', 'stocks')
+    cached = []
+    if os.path.exists(stocks_dir):
+        cached = [f[:-5].upper() for f in os.listdir(stocks_dir) if f.endswith('.json')]
+    combined = list(dict.fromkeys(cached + _POPULAR))
+    return jsonify(combined)
+
+
 @app.route('/api/status')
 def api_status():
     return jsonify({
