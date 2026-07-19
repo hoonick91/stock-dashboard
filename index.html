@@ -101,16 +101,30 @@
         .autocomplete-item {
             padding: 10px 16px;
             cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 600;
-            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             transition: background 0.15s;
         }
 
         .autocomplete-item:hover,
         .autocomplete-item.active {
             background: #f0f4ff;
-            color: #667eea;
+        }
+
+        .ac-symbol {
+            font-size: 0.92em;
+            font-weight: 700;
+            color: #2d3748;
+            min-width: 60px;
+        }
+
+        .ac-name {
+            font-size: 0.85em;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .timestamp {
@@ -1452,8 +1466,11 @@
         function showAc(items) {
             acIndex = -1;
             if (!items.length) { acList.style.display = 'none'; return; }
-            acList.innerHTML = items.slice(0, 8).map((s, i) =>
-                `<div class="autocomplete-item" data-val="${s}">${s}</div>`
+            acList.innerHTML = items.slice(0, 8).map(item =>
+                `<div class="autocomplete-item" data-val="${item.symbol}">
+                    <span class="ac-symbol">${item.symbol}</span>
+                    <span class="ac-name">${item.name || ''}</span>
+                </div>`
             ).join('');
             acList.style.display = 'block';
             acList.querySelectorAll('.autocomplete-item').forEach(el => {
@@ -1468,8 +1485,15 @@
 
         acInput.addEventListener('input', () => {
             const q = acInput.value.trim().toUpperCase();
-            if (!q) { acList.style.display = 'none'; return; }
-            showAc(allSymbols.filter(s => s.startsWith(q)));
+            if (!q) { showAc(allSymbols.slice(0, 8)); return; }
+            showAc(allSymbols.filter(s =>
+                s.symbol.startsWith(q) || s.name.toUpperCase().includes(q)
+            ));
+        });
+
+        acInput.addEventListener('focus', () => {
+            const q = acInput.value.trim().toUpperCase();
+            if (!q) showAc(allSymbols.slice(0, 8));
         });
 
         acInput.addEventListener('keydown', e => {
@@ -1479,10 +1503,12 @@
                 e.preventDefault();
                 acIndex = Math.min(acIndex + 1, items.length - 1);
                 items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+                if (acIndex >= 0) acInput.value = items[acIndex].dataset.val;
             } else if (e.key === 'ArrowUp') {
                 e.preventDefault();
                 acIndex = Math.max(acIndex - 1, 0);
                 items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+                if (acIndex >= 0) acInput.value = items[acIndex].dataset.val;
             } else if (e.key === 'Escape') {
                 acList.style.display = 'none';
             }

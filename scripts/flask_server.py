@@ -396,22 +396,52 @@ def index():
 
 
 _POPULAR = [
-    'AAPL','MSFT','NVDA','AMZN','GOOGL','META','TSLA','BRK.B','UNH','XOM',
-    'JPM','JNJ','V','PG','MA','HD','CVX','MRK','ABBV','LLY','AVGO','PEP',
-    'KO','COST','TMO','MCD','WMT','BAC','CSCO','ACN','ABT','NEE','TXN','PM',
-    'HON','QCOM','IBM','AMD','INTU','CAT','GS','BA','MS','GE','ORCL','CRM',
-    'NFLX','INTC','ADBE','NOW','UBER','PLTR','SNOW','ARM','TSM','BABA','NKE',
-    'DIS','PYPL','SHOP','SQ','COIN','MSTR','SPY','QQQ','SOFI','CRCL',
+    ('AAPL','Apple'),('MSFT','Microsoft'),('NVDA','NVIDIA'),('AMZN','Amazon'),
+    ('GOOGL','Alphabet'),('META','Meta'),('TSLA','Tesla'),('BRK.B','Berkshire Hathaway'),
+    ('UNH','UnitedHealth'),('XOM','ExxonMobil'),('JPM','JPMorgan Chase'),
+    ('JNJ','Johnson & Johnson'),('V','Visa'),('PG','Procter & Gamble'),
+    ('MA','Mastercard'),('HD','Home Depot'),('CVX','Chevron'),('MRK','Merck'),
+    ('ABBV','AbbVie'),('LLY','Eli Lilly'),('AVGO','Broadcom'),('PEP','PepsiCo'),
+    ('KO','Coca-Cola'),('COST','Costco'),('TMO','Thermo Fisher'),('MCD','McDonald\'s'),
+    ('WMT','Walmart'),('BAC','Bank of America'),('CSCO','Cisco'),('ACN','Accenture'),
+    ('ABT','Abbott'),('NEE','NextEra Energy'),('TXN','Texas Instruments'),('PM','Philip Morris'),
+    ('HON','Honeywell'),('QCOM','Qualcomm'),('IBM','IBM'),('AMD','AMD'),
+    ('INTU','Intuit'),('CAT','Caterpillar'),('GS','Goldman Sachs'),('BA','Boeing'),
+    ('MS','Morgan Stanley'),('GE','GE Aerospace'),('ORCL','Oracle'),('CRM','Salesforce'),
+    ('NFLX','Netflix'),('INTC','Intel'),('ADBE','Adobe'),('NOW','ServiceNow'),
+    ('UBER','Uber'),('PLTR','Palantir'),('SNOW','Snowflake'),('ARM','Arm Holdings'),
+    ('TSM','TSMC'),('BABA','Alibaba'),('NKE','Nike'),('DIS','Disney'),
+    ('PYPL','PayPal'),('SHOP','Shopify'),('SQ','Block'),('COIN','Coinbase'),
+    ('MSTR','MicroStrategy'),('SPY','S&P 500 ETF'),('QQQ','Nasdaq 100 ETF'),
+    ('SOFI','SoFi'),('CRCL','Circle'),
 ]
+_POPULAR_MAP = {s: n for s, n in _POPULAR}
 
 @app.route('/api/symbols')
 def get_symbols():
     stocks_dir = os.path.join(os.path.dirname(__file__), '..', 'cache', 'stocks')
-    cached = []
+    result = []
+    seen = set()
+
     if os.path.exists(stocks_dir):
-        cached = [f[:-5].upper() for f in os.listdir(stocks_dir) if f.endswith('.json')]
-    combined = list(dict.fromkeys(cached + _POPULAR))
-    return jsonify(combined)
+        for fname in os.listdir(stocks_dir):
+            if not fname.endswith('.json'):
+                continue
+            sym = fname[:-5].upper()
+            try:
+                with open(os.path.join(stocks_dir, fname)) as f:
+                    d = json.load(f)
+                name = (d.get('quote', {}).get('data') or {}).get('name', '') or _POPULAR_MAP.get(sym, '')
+            except Exception:
+                name = _POPULAR_MAP.get(sym, '')
+            result.append({'symbol': sym, 'name': name})
+            seen.add(sym)
+
+    for sym, name in _POPULAR:
+        if sym not in seen:
+            result.append({'symbol': sym, 'name': name})
+
+    return jsonify(result)
 
 
 @app.route('/api/status')
